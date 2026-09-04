@@ -1,1 +1,12 @@
-
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.williammeintjies308_coder.twa",
+      "sha256_cert_fingerprints": [
+        "9F:7D:06:D7:EA:84:68:A1:80:12:CD:89:77:E3:DD:4F:94:B9:E6:D8:18:DE:01:16:DC:7C:6D:A2:10:F3:15:BE"
+      ]
+    }
+  }
+]
