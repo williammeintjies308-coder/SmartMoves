@@ -1,0 +1,13 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "DagGeld — Daaglikse Kontant Beplanner",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "DagGeld",
+  "start_url": "/",
+  "theme_color": "#0d0f0e",
+  "description": "'n Eenvoudige, vanlyn daaglikse begrotingsprogram om jou sakgeld te beheer en daagliks oorskietgeld in jou Spaarpot te stoor.",
+  "lang": "af"
+}
