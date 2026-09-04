@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="af">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#121212">
+<title>DagGeld — Daaglikse Kontant Begroting</title>
+<style>
+  :root{
+    --bg:#121212;
+    --bg-card:#1a1a1a;
+    --bg-input:#202020;
+    --border:#2a2a2a;
+    --text:#f5f5f5;
+    --muted:#9a9a9a;
+    --green:#22C55E;
+    --green-dim:#14532d;
+    --amber:#f59e0b;
+    --red:#ef4444;
+    --gold:#f59e0b;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex;justify-content:center;
+    min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .phone{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    padding:20px 18px 40px;
+    display:flex;flex-direction:column;
+  }
+
+  /* ---------- HEADER ---------- */
+  .header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:6px 2px 18px;
+  }
+  .brand{display:flex;align-items:baseline;gap:8px}
+  .brand h1{
+    font-size:24px;font-weight:800;letter-spacing:-0.5px;
+    background:linear-gradient(120deg,#ffffff,#22C55E);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .header-actions{display:flex;align-items:center;gap:8px}
+  .pro-badge{
+    background:linear-gradient(120deg,#f59e0b,#22C55E);
+    color:#000;border:none;border-radius:20px;
+    padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;gap:4px;transition:.15s;
+  }
+  .pro-badge:hover{filter:brightness(1.1)}
+  .pro-badge.pro-active{background:linear-gradient(120deg,#22C55E,#0f9d58);color:#052e16}
+  .reset-btn{
+    background:var(--bg-card);border:1px solid var(--border);
+    color:var(--muted);border-radius:10px;
+    padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;gap:6px;transition:.15s;
+  }
+  .reset-btn:hover{color:var(--red);border-color:var(--red)}
+
+  /* ---------- SCREENS ---------- */
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex}
+
+  /* ---------- SETUP ---------- */
+  .setup-wrap{justify-content:center;gap:22px;padding:20px 0}
+  .logo-mark{
+    width:64px;height:64px;border-radius:20px;margin:0 auto 4px;
+    background:linear-gradient(135deg,#22C55E,#14532d);
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:900;color:#fff;
+    box-shadow:0 8px 30px rgba(34,197,94,.25);
+  }
+  .setup-title{text-align:center}
+  .setup-title h2{font-size:22px;font-weight:800;letter-spacing:-.3px}
+  .setup-title p{color:var(--muted);font-size:13px;margin-top:6px}
+
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 6px}
+  input[type=number],input[type=text]{
+    width:100%;background:var(--bg-input);border:1px solid var(--border);
+    border-radius:12px;color:var(--text);font-size:16px;padding:14px;
+    outline:none;transition:.15s;font-family:inherit;
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input:focus{border-color:var(--green)}
+  input::placeholder{color:#555}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    width:100%;border:none;border-radius:14px;padding:16px;font-size:16px;
+    font-weight:800;cursor:pointer;transition:.15s;font-family:inherit;
+  }
+  .btn-primary{background:var(--green);color:#052e16}
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-primary:active{transform:scale(.98)}
+  .btn-ghost{
+    background:var(--bg-card);border:1px solid var(--border);
+    color:var(--text);
+  }
+  .btn-ghost:hover{border-color:var(--green);color:var(--green)}
+  .btn-ghost:active{transform:scale(.98)}
+  .btn-block{margin-top:18px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(160deg,#1c1c1c,#151515);
+    border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px 20px;text-align:center;position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;top:-60px;right:-60px;width:180px;height:180px;
+    background:radial-gradient(circle,rgba(34,197,94,.15),transparent 70%);
+    pointer-events:none;
+  }
+  .hero-label{
+    font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .hero-amount{
+    font-size:52px;font-weight:900;letter-spacing:-1px;margin:10px 0 8px;
+    line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .hero-amount .cur{font-size:30px;font-weight:700;color:var(--green);margin-right:4px}
+  .hero-sub{font-size:14px;font-weight:600;color:var(--muted)}
+  .hero-sub b{color:var(--text)}
+  .hero-sub.warn{color:var(--amber)}
+  .hero-sub.over{color:var(--red)}
+  .hero-sub.over b{color:var(--red)}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .stat{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:14px;padding:14px 16px;text-align:center;
+  }
+  .stat .k{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font-size:20px;font-weight:800;margin-top:5px;font-variant-numeric:tabular-nums}
+
+  /* ---------- WARN ---------- */
+  .warning-banner{
+    background:rgba(245,158,11,.1);border:1px solid var(--amber);
+    color:var(--amber);border-radius:12px;padding:10px 14px;font-size:12px;
+    font-weight:600;margin-top:14px;text-align:center;
+  }
+
+  /* ---------- PRO CARDS ---------- */
+  .pro-card{
+    display:flex;align-items:center;gap:12px;
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:14px;padding:14px 16px;margin-top:12px;cursor:pointer;
+    transition:.15s;
+  }
+  .pro-card:hover{border-color:var(--green)}
+  .pro-card .icon{font-size:22px;flex-shrink:0}
+  .pro-card .body{flex:1;min-width:0}
+  .pro-card .title{font-size:14px;font-weight:700}
+  .pro-card .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .pro-card .cta{font-size:11px;font-weight:800;color:var(--green);background:rgba(34,197,94,.12);padding:5px 9px;border-radius:8px;flex-shrink:0}
+  .pro-card.unlocked .title{color:var(--green)}
+  .pro-card.unlocked .cta{color:#052e16;background:var(--green)}
+
+  /* ---------- QUICK ACTION ---------- */
+  .section-title{
+    font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+    color:var(--muted);margin:24px 0 10px;
+  }
+  .quick-card{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:16px;
+  }
+  .quick-card .field{margin-bottom:10px}
+  .quick-card .field:last-of-type{margin-bottom:0}
+  .quick-btn{margin-top:14px}
+
+  /* ---------- ACTIVITY ---------- */
+  .list{display:flex;flex-direction:column;gap:8px}
+  .expense{
+    display:flex;align-items:center;gap:12px;
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:12px;padding:12px 14px;
+    animation:fadeIn .2s ease;
+  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .expense .desc{flex:1;min-width:0}
+  .expense .desc .t{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .expense .desc .m{font-size:11px;color:var(--muted);margin-top:2px}
+  .expense .amt{font-size:15px;font-weight:800;color:var(--green);font-variant-numeric:tabular-nums}
+  .del{
+    background:none;border:none;color:#555;font-size:16px;cursor:pointer;
+    padding:6px;border-radius:8px;line-height:1;transition:.15s;
+  }
+  .del:hover{color:var(--red);background:rgba(239,68,68,.1)}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:18px 0}
+
+  /* ---------- BOTTOM ACTION ---------- */
+  .bottom{padding-top:22px;margin-top:auto}
+  .close-btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--bg-card);border:1px solid var(--green);color:var(--green);
+  }
+  .close-btn:hover{background:var(--green-dim);color:#fff}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.72);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;padding:20px;
+  }
+  .modal{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:20px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+    padding:26px 20px 20px;position:relative;
+  }
+  .modal-close{
+    position:absolute;top:14px;right:14px;background:none;border:none;
+    color:var(--muted);font-size:22px;cursor:pointer;padding:6px;line-height:1;
+  }
+  .modal-close:hover{color:var(--text)}
+  .modal h2{font-size:22px;font-weight:800;margin-bottom:6px;padding-right:32px}
+  .modal .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .pro-feature{
+    display:flex;gap:10px;align-items:flex-start;
+    background:var(--bg-input);border:1px solid var(--border);
+    border-radius:12px;padding:12px;margin-bottom:10px;font-size:13px;line-height:1.45;
+  }
+  .pro-feature .f-ico{flex-shrink:0}
+  .price-btn{margin-top:18px}
+  .later-btn{margin-top:10px}
+
+  /* ---------- PRO MODALS ---------- */
+  .pro-big{font-size:38px;font-weight:900;color:var(--green);text-align:center;margin:4px 0 16px;font-variant-numeric:tabular-nums}
+  .pro-stat-row{display:flex;justify-content:space-between;align-items:center;padding:12px 2px;border-bottom:1px solid var(--border);font-size:14px}
+  .pro-stat-row b{font-weight:800;font-variant-numeric:tabular-nums}
+  .hist-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--border);font-size:13px}
+  .hist-row .hd{color:var(--muted);font-size:11px;margin-top:2px}
+  .hist-row .hd-t{font-weight:600}
+  .hist-row .ha{font-weight:800;font-variant-numeric:tabular-nums;flex-shrink:0}
+  .hist-row .ha.plus{color:var(--green)}
+  .hist-row .ha.minus{color:var(--text)}
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:#262626;color:var(--text);border:1px solid var(--border);
+    padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw;text-align:center;
+    box-shadow:0 8px 30px rgba(0,0,0,.5);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{border-color:var(--red);color:#fca5a5}
+  .toast.good{border-color:var(--green);color:#86efac}
+  .toast.warn{border-color:var(--amber);color:#fcd34d}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header" style="display:none">
+    <div class="brand">
+      <h1>DagGeld</h1>
+    </div>
+    <div class="header-actions">
+      <button class="pro-badge" id="proBadge" title="DagGeld Pro">✨&nbsp; Pro</button>
+      <button class="reset-btn" id="resetBtn" title="Herstel begroting">⟳&nbsp; Herstel</button>
+    </div>
+  </header>
+
+  <!-- ===== SCREEN: SETUP ===== -->
+  <section class="screen setup-wrap" id="setupScreen">
+    <div>
+      <div class="logo-mark">R</div>
+      <div class="setup-title">
+        <h2>Begin Jou DagGeld</h2>
+        <p>Stel jou totale kontant in en plan tot betaaldag.</p>
+      </div>
+
+      <div class="field">
+        <label for="inTotal">Totale kontant beskikbaar (R)</label>
+        <input type="number" id="inTotal" inputmode="decimal" placeholder="bv. 1500" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label for="inDays">Hoeveel dae tot betaaldag?</label>
+        <input type="number" id="inDays" inputmode="numeric" placeholder="bv. 10" min="1" step="1">
+      </div>
+
+      <button class="btn btn-primary btn-block" id="beginBtn">Begin Begroting</button>
+      <p class="hint">Jou data word veilig op hierdie toestel gestoor.</p>
+    </div>
+  </section>
+
+  <!-- ===== SCREEN: DASHBOARD ===== -->
+  <section class="screen" id="dashScreen">
+
+    <div class="hero">
+      <div class="hero-label">Vandag se Limiet</div>
+      <div class="hero-amount"><span class="cur">R</span><span id="dailyLimit">0.00</span></div>
+      <div class="hero-sub" id="remainingToday">Oor vir vandag: R 0.00</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">Totale Kontant</div><div class="v" id="totalCash">R 0.00</div></div>
+      <div class="stat"><div class="k">Dae Oorbly</div><div class="v" id="daysLeft">0</div></div>
+    </div>
+
+    <div class="warning-banner" id="warnBanner" style="display:none">
+      ⚠️ Jy het vir vandag oorbestee. Beperk uitgawes vir die res van die dag.
+    </div>
+
+    <!-- Pro feature cards -->
+    <div class="section-title">DagGeld Pro Gereedskap</div>
+    <div class="pro-card locked" id="vaultCard">
+      <div class="icon" id="vaultIcon">🔒</div>
+      <div class="body">
+        <div class="title">Spaarpot (Vault)</div>
+        <div class="sub" id="vaultSub">Stoor daaglikse oorskietgeld</div>
+      </div>
+      <div class="cta" id="vaultCta">✨&nbsp; Pro</div>
+    </div>
+    <div class="pro-card locked" id="bankCard">
+      <div class="icon" id="bankIcon">🔒</div>
+      <div class="body">
+        <div class="title">Volledige Bankstaat &amp; Geskiedenis</div>
+        <div class="sub">Sien presies waar elke sent heen is</div>
+      </div>
+      <div class="cta">✨&nbsp; Pro</div>
+    </div>
+
+    <div class="section-title">Trek Af</div>
+    <div class="quick-card">
+      <div class="field">
+        <input type="number" id="inAmount" inputmode="decimal" placeholder="Bedrag (R)" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <input type="text" id="inDesc" placeholder="Waarvoor? (bv. Brood / Taxi)" maxlength="40">
+      </div>
+      <button class="btn btn-primary quick-btn" id="addBtn">+&nbsp; Trek Af</button>
+    </div>
+
+    <div class="section-title">Vandag se Uitgawes</div>
+    <div class="list" id="activityList"></div>
+
+    <div class="bottom">
+      <button class="btn btn-ghost close-btn" id="closeDayBtn">
+        <span>➜</span> Sluit Dag Af (Gaan na Môre)
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== PAYWALL MODAL ===== -->
+<div class="modal-overlay" id="paywall" style="display:none">
+  <div class="modal">
+    <button class="modal-close" data-close="paywall">✕</button>
+    <h2>Ontsluit DagGeld Pro 🚀</h2>
+    <p class="sub">Neem volle beheer oor jou begroting met kragtige ekstra gereedskap.</p>
+    <div class="pro-feature"><span class="f-ico">🔓</span><span><b>Spaarpot (Vault):</b> Enige geld wat oorbly aan die einde van die dag skuif outomaties na jou veilige Spaarpot.</span></div>
+    <div class="pro-feature"><span class="f-ico">📊</span><span><b>Volledige Bankstaat:</b> Kyk terug na vorige dae se uitgawes, sien totale gespaar, en ontleed jou bestedingspatrone.</span></div>
+    <div class="pro-feature"><span class="f-ico">📁</span><span><b>Voer Uit na PDF/Excel:</b> Laai jou hele begrotingstate af vir jou eie rekords.</span></div>
+    <div class="pro-feature"><span class="f-ico">🚫</span><span><b>Geen Advertensies &amp; Lewenslange Toegang:</b> Betaal een keer, gebruik vir altyd.</span></div>
+    <button class="btn btn-primary price-btn" id="purchaseBtn">Ontsluit Lewenslank vir R29 (Eenmalig)</button>
+    <button class="btn btn-ghost later-btn" id="paywallLater">Miskien Later</button>
+  </div>
+</div>
+
+<!-- ===== VAULT MODAL ===== -->
+<div class="modal-overlay" id="vaultModal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" data-close="vaultModal">✕</button>
+    <h2>🏦 Spaarpot (Vault)</h2>
+    <p class="sub">Jou veilige oorskietgeld. Beskerm vir die toekoms.</p>
+    <div class="pro-big">R <span id="vaultBalance">0.00</span></div>
+    <div class="section-title" style="margin-top:0">Onlangse Besparings</div>
+    <div id="vaultList"></div>
+  </div>
+</div>
+
+<!-- ===== STATEMENT MODAL ===== -->
+<div class="modal-overlay" id="statementModal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" data-close="statementModal">✕</button>
+    <h2>📊 Volledige Bankstaat &amp; Geskiedenis</h2>
+    <p class="sub">Kyk presies waar elke sent heen is.</p>
+    <div class="pro-stat-row"><span>Totaal spandeer</span><b id="stTotalSpent">R 0.00</b></div>
+    <div class="pro-stat-row"><span>Totaal gespaar (Spaarpot)</span><b id="stTotalSaved">R 0.00</b></div>
+    <div class="section-title">Transaksies</div>
+    <div id="statementList"></div>
+    <button class="btn btn-primary btn-block" id="exportBtn" style="margin-top:16px">📁&nbsp; Voer Uit na Excel</button>
+    <button class="btn btn-ghost btn-block" id="printBtn" style="margin-top:10px">🖨&nbsp; Druk / Stoor as PDF</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = "daggeld.budget.v1";
+  var PRO_KEY = "daggeld.pro.v1";
+
+  // ---- Google Play In-App Billing config ----
+  var PLAY_PRODUCT_ID   = "daggeld_pro_unlock";
+  var PLAY_PRODUCT_TYPE = "inapp"; // non-consumable / lifetime unlock
+  var PRO_PRICE_LABEL   = "R29";
+
+  function fmt(n){
+    n = Number(n)||0;
+    var neg = n < 0 ? "-" : "";
+    var v = Math.abs(n).toFixed(2);
+    var parts = v.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return neg + parts.join(".");
+  }
+  function money(n){ return "R " + fmt(n); }
+
+  // Round money to standard 2-decimal currency precision.
+  function round2(n){
+    n = Number(n) || 0;
+    return Math.round((n + Number.EPSILON) * 100) / 100;
+  }
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function clock(d){
+    var hh = String(d.getHours()).padStart(2,"0");
+    var mm = String(d.getMinutes()).padStart(2,"0");
+    return hh+":"+mm;
+  }
+  function fullDT(ts){
+    var d = new Date(ts);
+    return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+" "+clock(d);
+  }
+
+  // ---------- state ----------
+  var state = {
+    totalCash: 0,
+    daysLeft: 0,
+    dailyBudget: 0, // stable today's limit = totalCash/daysLeft at day start
+    dateKey: null,
+    expenses: [],   // {date, d(desc), a(amount)}  -> today
+    isPro: false,   // DagGeld Pro unlocked
+    purchasedAt: null,
+    vault: 0,       // saved money in Spaarpot
+    history: []     // full transaction log {ts, type:'spend'|'vault', d, a}
+  };
+
+  function emptyState(){
+    return { totalCash:0, daysLeft:0, dailyBudget:0, dateKey:todayKey(), expenses:[], isPro:false, purchasedAt:null, vault:0, history:[] };
+  }
+
+  function readProFlag(){
+    var pro = false;
+    try{
+      var r = localStorage.getItem(PRO_KEY);
+      if(r){ pro = !!(JSON.parse(r).isPro); }
+    }catch(e){}
+    return pro;
+  }
+  function loadPro(){
+    var pro = readProFlag();
+    var purchasedAt = null;
+    try{
+      var r = localStorage.getItem(PRO_KEY);
+      if(r){ purchasedAt = JSON.parse(r).purchasedAt || null; }
+    }catch(e){}
+    state.isPro = pro;
+    state.purchasedAt = pro ? (purchasedAt || Date.now()) : null;
+  }
+  function savePro(){
+    try{
+      localStorage.setItem(PRO_KEY, JSON.stringify({
+        isPro: !!state.isPro,
+        purchasedAt: state.isPro ? (state.purchasedAt || Date.now()) : null
+      }));
+    }catch(e){}
+  }
+
+  function load(){
+    state = emptyState();
+    try{
+      var raw = localStorage.getItem(KEY);
+      if(raw){
+        var p = JSON.parse(raw);
+        state.totalCash = round2(p.totalCash);
+        state.daysLeft   = Number(p.daysLeft)||0;
+        state.dailyBudget = round2(p.dailyBudget);
+        if(!(state.dailyBudget > 0) && state.daysLeft > 0){ // migrate older saves
+          state.dailyBudget = round2(state.totalCash / state.daysLeft);
+        }
+        state.dateKey    = p.dateKey || todayKey();
+        state.expenses   = (Array.isArray(p.expenses) ? p.expenses : []).map(function(x){
+          return { date: x.date, d: x.d, a: round2(x.a) };
+        });
+        state.vault   = round2(p.vault);
+        state.history = Array.isArray(p.history) ? p.history : [];
+      }
+    }catch(e){ state = emptyState(); }
+    loadPro();
+    state.dateKey = todayKey();
+  }
+
+  function save(){
+    try{
+      localStorage.setItem(KEY, JSON.stringify({
+        totalCash: state.totalCash,
+        daysLeft: state.daysLeft,
+        dailyBudget: state.dailyBudget,
+        dateKey: state.dateKey,
+        expenses: state.expenses,
+        vault: state.vault,
+        history: state.history
+      }));
+    }catch(e){}
+  }
+
+  function spentToday(){
+    var s = 0;
+    state.expenses.forEach(function(x){ s = s + round2(x.a); });
+    return round2(s);
+  }
+  // Today's limit is a STABLE value held for the day (set at day start / budget
+  // start). Spending reduces total cash immediately and reduces "Oor vir vandag"
+  // (= dailyBudget - spentToday) WITHOUT shrinking the daily limit itself.
+  function dailyLimit(){
+    return round2(state.dailyBudget || 0);
+  }
+
+  // ---------- modals ----------
+  function openModal(id){ $(id).style.display = "flex"; renderStatementIfOpen(); }
+  function closeModal(id){ $(id).style.display = "none"; }
+  function closeAllModals(){
+    $("paywall").style.display="none";
+    $("vaultModal").style.display="none";
+    $("statementModal").style.display="none";
+  }
+  function openPaywall(){
+    if(state.isPro) return;
+    openModal("paywall");
+  }
+
+  // ---------- render ----------
+  function render(){
+    var limit = dailyLimit();
+
+    if(state.daysLeft > 0 && state.totalCash > 0){
+      $("header").style.display = "flex";
+      showScreen("dashScreen");
+
+      $("dailyLimit").textContent = fmt(limit);
+      $("totalCash").textContent  = money(state.totalCash);
+      $("daysLeft").textContent   = String(state.daysLeft);
+
+      var spent = spentToday();
+      var left  = limit - spent;
+      var sub   = $("remainingToday");
+      sub.classList.remove("ok","warn","over");
+
+      if(left < 0){
+        sub.classList.add("over");
+        sub.innerHTML = "Oor vir vandag: <b>-R " + fmt(Math.abs(left)) + "</b> (oorgely)";
+      }else if(left <= 0.009){
+        sub.classList.add("warn");
+        sub.innerHTML = "Oor vir vandag: <b>R 0.00</b> — uitgespandeer";
+      }else if(left < limit * 0.2){
+        sub.classList.add("warn");
+        sub.innerHTML = "Oor vir vandag: <b>R " + fmt(left) + "</b>";
+      }else{
+        sub.classList.add("ok");
+        sub.innerHTML = "Oor vir vandag: <b>R " + fmt(left) + "</b>";
+      }
+
+      $("warnBanner").style.display = (spent > limit) ? "block" : "none";
+      renderActivity();
+      renderPro();
+    }else{
+      $("header").style.display = "none";
+      showScreen("setupScreen");
+    }
+  }
+
+  function showScreen(id){
+    $("setupScreen").classList.remove("active");
+    $("dashScreen").classList.remove("active");
+    $(id).classList.add("active");
+  }
+
+  // ---------- Pro UI ----------
+  function renderPro(){
+    var pro = !!state.isPro;
+    // badge
+    var badge = $("proBadge");
+    badge.classList.toggle("pro-active", pro);
+    badge.textContent = pro ? "✨ Pro Aktief" : "✨ Pro";
+    // feature cards
+    $("vaultCard").classList.toggle("unlocked", pro);
+    $("bankCard").classList.toggle("unlocked", pro);
+    $("vaultIcon").textContent = pro ? "🏦" : "🔒";
+    $("bankIcon").textContent = pro ? "📊" : "🔒";
+    $("vaultCta").textContent = pro ? "Oop" : "✨ Pro";
+    $("vaultSub").textContent = pro ? ("Gespaar: R " + fmt(state.vault)) : "Stoor daaglikse oorskietgeld";
+  }
+
+  function renderStatementIfOpen(){
+    if($("vaultModal").style.display === "flex") renderVault();
+    if($("statementModal").style.display === "flex") renderStatement();
+  }
+
+  function renderVault(){
+    $("vaultBalance").textContent = fmt(state.vault);
+    var vl = $("vaultList");
+    vl.innerHTML = "";
+    var deposits = state.history.filter(function(h){ return h.type === "vault"; });
+    if(!deposits.length){
+      vl.innerHTML = '<div class="empty">Nog geen besparings nie. Jou oorskietgeld sal hier verskyn.</div>';
+      return;
+    }
+    deposits.slice().reverse().slice(0,15).forEach(function(h){
+      var row = document.createElement("div");
+      row.className = "hist-row";
+      var lhs = document.createElement("div");
+      var t = document.createElement("div");
+      t.className = "hd-t"; t.textContent = h.d || "Spaarpot";
+      var m = document.createElement("div");
+      m.className = "hd"; m.textContent = fullDT(h.ts);
+      lhs.appendChild(t); lhs.appendChild(m);
+      var amt = document.createElement("div");
+      amt.className = "ha plus"; amt.textContent = "+R " + fmt(h.a);
+      row.appendChild(lhs); row.appendChild(amt);
+      vl.appendChild(row);
+    });
+  }
+
+  function renderStatement(){
+    var spent = 0, saved = 0;
+    state.history.forEach(function(h){
+      if(h.type === "spend") spent = round2(spent + h.a);
+      else if(h.type === "vault") saved = round2(saved + h.a);
+    });
+    $("stTotalSpent").textContent = money(spent);
+    $("stTotalSaved").textContent = money(saved);
+
+    var sl = $("statementList");
+    sl.innerHTML = "";
+    if(!state.history.length){
+      sl.innerHTML = '<div class="empty">Nog geen transaksies nie.</div>';
+      return;
+    }
+    state.history.slice().reverse().forEach(function(h){
+      var row = document.createElement("div");
+      row.className = "hist-row";
+      var lhs = document.createElement("div");
+      var t = document.createElement("div");
+      t.className = "hd-t"; t.textContent = h.d || (h.type === "vault" ? "Spaarpot" : "Uitgawe");
+      var m = document.createElement("div");
+      m.className = "hd"; m.textContent = fullDT(h.ts) + " · " + (h.type === "vault" ? "Spaarpot" : "Uitgawe");
+      lhs.appendChild(t); lhs.appendChild(m);
+      var amt = document.createElement("div");
+      amt.className = "ha " + (h.type === "vault" ? "plus" : "minus");
+      amt.textContent = (h.type === "vault" ? "+R " : "-R ") + fmt(h.a);
+      row.appendChild(lhs); row.appendChild(amt);
+      sl.appendChild(row);
+    });
+  }
+
+  // ---------- activity ----------
+  function renderActivity(){
+    var list = $("activityList");
+    list.innerHTML = "";
+    if(!state.expenses.length){
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = "Nog geen uitgawes vir vandag nie. Jy is veilig. 💪";
+      list.appendChild(e);
+      return;
+    }
+    state.expenses.forEach(function(x, idx){
+      var row = document.createElement("div");
+      row.className = "expense";
+
+      var desc = document.createElement("div");
+      desc.className = "desc";
+      var t = document.createElement("div");
+      t.className = "t";
+      t.textContent = (x.d && x.d.trim()) ? x.d.trim() : "Onbekend";
+      var m = document.createElement("div");
+      m.className = "m";
+      m.textContent = "Vandag " + clock(new Date(x.date));
+      desc.appendChild(t); desc.appendChild(m);
+
+      var amt = document.createElement("div");
+      amt.className = "amt";
+      amt.textContent = "-R " + fmt(x.a);
+
+      var del = document.createElement("button");
+      del.className = "del";
+      del.textContent = "✕";
+      del.title = "Verwyder";
+      del.setAttribute("aria-label","Verwyder uitgawe");
+      del.addEventListener("click", function(){
+        state.expenses.splice(idx,1);
+        state.totalCash = round2(state.totalCash + round2(x.a));
+        // also remove from history log (undo)
+        for(var i=state.history.length-1;i>=0;i--){
+          var h=state.history[i];
+          if(h.type==="spend" && round2(h.a)===round2(x.a) && h.ts===x.date){ state.history.splice(i,1); break; }
+        }
+        save(); render();
+        toast("Uitgawe teruggetrek: R " + fmt(x.a) + " teruggestel.","warn");
+      });
+
+      row.appendChild(desc); row.appendChild(amt); row.appendChild(del);
+      list.appendChild(row);
+    });
+  }
+
+  // ---------- actions ----------
+  function startBudget(){
+    var total = parseFloat($("inTotal").value);
+    var days  = parseInt($("inDays").value,10);
+    if(isNaN(total) || total <= 0){ toast("Tik 'n geldige kontantbedrag in.","err"); $("inTotal").focus(); return; }
+    if(isNaN(days) || days < 1){ toast("Tik 'n geldige aantal dae in (min. 1).","err"); $("inDays").focus(); return; }
+    state.totalCash   = round2(total);
+    state.daysLeft    = days;
+    state.dailyBudget = round2(total / days);
+    state.expenses    = [];
+    state.dateKey     = todayKey();
+    save(); savePro(); render();
+    toast("Begroting gestig! Sê vir vandag, slim.","good");
+  }
+
+  function addExpense(){
+    var amt = parseFloat($("inAmount").value);
+    if(isNaN(amt) || amt <= 0){ toast("Tik 'n geldige bedrag in.","err"); $("inAmount").focus(); return; }
+    var desc = $("inDesc").value.trim();
+    var paid = round2(amt);
+    state.expenses.push({ date: Date.now(), d: desc, a: paid });
+    state.totalCash = round2(Math.max(0, state.totalCash - paid));
+    state.history.push({ ts: Date.now(), type: "spend", d: desc || "Uitgawe", a: paid });
+    $("inAmount").value = "";
+    $("inDesc").value  = "";
+    save(); render();
+    toast("R " + fmt(amt) + " afgetrek.","good");
+  }
+
+  // Spend is deducted from totalCash IMMEDIATELY in addExpense(). Closing the
+  // day therefore never subtracts spent again (no double-count). It only:
+  //  1) (Pro) sweeps today's unspent allowance = dailyBudget - spent into Vault,
+  //  2) clears today's list, decrements days,
+  //  3) sets tomorrow's dailyBudget from the leftover cash / remaining days.
+  function closeDay(){
+    var spent  = spentToday();
+    var budget = dailyLimit();
+    var unspent = state.isPro ? round2(Math.max(0, budget - spent)) : 0;
+
+    if(unspent > 0){
+      state.vault = round2(state.vault + unspent);
+      state.history.push({ ts: Date.now(), type: "vault", d: "Daglikse oorskiet na Spaarpot", a: unspent });
+      state.totalCash = round2(Math.max(0, state.totalCash - unspent));
+    }
+
+    state.expenses = [];
+
+    if(state.daysLeft <= 1){
+      state.daysLeft    = 0;
+      state.dailyBudget = 0;
+      state.dateKey     = todayKey();
+      save(); savePro(); render();
+      toast("Begroting klaar vir hierdie periode. 🎉 Begin 'n nuwe een.","good");
+      return;
+    }
+
+    state.daysLeft -= 1;
+    state.dailyBudget = round2(Math.max(0, state.totalCash / state.daysLeft));
+    state.dateKey     = todayKey();
+    save(); savePro(); render();
+    toast("Dag gesluit! Nuwe limiet bereken.","good");
+  }
+
+  function resetBudget(){
+    if(confirm("Is jy seker jy wil die begroting herstel? Alle data sal uitgewis word.")){
+      var keepVault = state.isPro ? state.vault : 0;
+      var keepHist  = state.isPro ? state.history.slice() : [];
+      var keepPro   = state.isPro;
+      try{ localStorage.removeItem(KEY); }catch(e){}
+      state = emptyState();
+      state.isPro = keepPro;
+      if(keepPro){ state.purchasedAt = Date.now(); }
+      state.vault   = keepVault;
+      state.history = keepHist;
+      save(); savePro();
+      $("inTotal").value=""; $("inDays").value="";
+      $("inAmount").value=""; $("inDesc").value="";
+      render();
+      toast("Begroting herstel.","warn");
+    }
+  }
+
+  // ---------- Pro / purchase ----------
+  function onCardTap(which){
+    if(state.isPro){
+      if(which === "vault") openModal("vaultModal");
+      else openModal("statementModal");
+    }else{
+      openPaywall();
+    }
+  }
+
+  function purchasePro(){
+    // Google Play In-App Billing integration.
+    // In a native wrapper, inject a bridge (window.__dagGeldNativePurchase)
+    // that wraps the Play Billing Library with this non-consumable product.
+    if(typeof window.__dagGeldNativePurchase === "function"){
+      window.__dagGeldNativePurchase({
+        productId:  PLAY_PRODUCT_ID,
+        productType: PLAY_PRODUCT_TYPE,
+        priceLabel: PRO_PRICE_LABEL,
+        onSuccess: unlockPro,
+        onCancel: function(){ toast("Aankoop gekanselleer.","warn"); }, // keep modal open, state unchanged
+        onFail:    function(){ toast("Aankoop het misluk. Probeer asseblief weer.","err"); } // state unchanged
+      });
+      return;
+    }
+    // Web / demo build: simulate a successful non-consumable unlock.
+    // Replace with a real Play Billing call inside your native wrapper.
+    unlockPro();
+  }
+
+  function unlockPro(){
+    state.isPro = true;
+    state.purchasedAt = Date.now();
+    savePro(); save(); render();
+    closeAllModals();
+    alert("Welkom by DagGeld Pro! Jou Spaarpot en Bankstaat is nou aktief.");
+  }
+
+  // ---------- export ----------
+  function exportCSV(){
+    if(!state.history.length){ toast("Nog geen transaksies om uit te voer nie.","warn"); return; }
+    var rows = [["Datum","Tipe","Beskrywing","Bedrag (R)"]];
+    state.history.forEach(function(h){
+      rows.push([ fullDT(h.ts), h.type === "vault" ? "Spaarpot" : "Uitgawe", (h.d||""), fmt(h.a) ]);
+    });
+    var csv = rows.map(function(r){
+      return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(",");
+    }).join("\r\n");
+    var blob = new Blob(["\uFEFF"+csv], { type: "text/csv;charset=utf-8;" });
+    var a = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    a.href = url; a.download = "daggeld_bankstaat.csv";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 150);
+    toast("Bankstaat uitgevoer (oop in Excel).","good");
+  }
+
+  // ---------- toast ----------
+  var toastTimer = null;
+  function toast(msg, type){
+    var el = $("toast");
+    el.className = "toast show" + (type ? " "+type : "");
+    el.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.className = "toast"; }, 2400);
+  }
+
+  // ---------- bind ----------
+  $("beginBtn").addEventListener("click", startBudget);
+  $("addBtn").addEventListener("click", addExpense);
+  $("closeDayBtn").addEventListener("click", closeDay);
+  $("resetBtn").addEventListener("click", resetBudget);
+
+  $("proBadge").addEventListener("click", function(){ onCardTap(state.isPro ? "bank" : "paywall"); });
+  $("vaultCard").addEventListener("click", function(){ onCardTap("vault"); });
+  $("bankCard").addEventListener("click", function(){ onCardTap("bank"); });
+
+  $("purchaseBtn").addEventListener("click", purchasePro);
+  $("paywallLater").addEventListener("click", function(){ closeModal("paywall"); });
+  $("exportBtn").addEventListener("click", exportCSV);
+  $("printBtn").addEventListener("click", function(){ window.print(); });
+
+  // close via ✕ buttons
+  document.querySelectorAll("[data-close]").forEach(function(b){
+    b.addEventListener("click", function(){ closeModal(b.getAttribute("data-close")); });
+  });
+  // close by tapping the overlay backdrop
+  ["paywall","vaultModal","statementModal"].forEach(function(id){
+    $(id).addEventListener("click", function(ev){ if(ev.target === this) closeModal(id); });
+  });
+
+  [$("inTotal"), $("inDays")].forEach(function(i){
+    i.addEventListener("keydown", function(ev){ if(ev.key==="Enter") startBudget(); });
+  });
+  [$("inAmount"), $("inDesc")].forEach(function(i){
+    i.addEventListener("keydown", function(ev){ if(ev.key==="Enter") addExpense(); });
+  });
+
+  // ---------- boot ----------
+  load();
+  render();
+  renderPro();
+})();
+</script>
+</body>
+</html>
