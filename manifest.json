@@ -1,0 +1,12 @@
+{
+  "name": "DagGeld",
+  "short_name": "DagGeld",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0D0F0E",
+  "theme_color": "#10B981",
+  "orientation": "portrait",
+  "lang": "af",
+  "description": "'n Eenvoudige, vanlyn daaglikse begrotingsprogram om jou sakgeld te beheer en daagliks oorskietgeld in jou Spaarpot te stoor."
+}
+
